@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Empleo Web - Simulador de búsqueda</title>
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Element SDK (obligatorio) -->
+    <script src="/_sdk/element_sdk.js"></script>
+    <style>
+      body {
+        box-sizing: border-box;
+      }
+
+      /* Scroll suave y fondo por defecto (se sobreescribe vía config) */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Focus visible para accesibilidad */
+      :focus-visible {
+        outline: 3px solid rgba(59, 130, 246, 0.7);
+        outline-offset: 2px;
+      }
+    </style>
+    <style>
+      @view-transition {
+        navigation: auto;
+      }
+    </style>
+    <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  </head>
+  <body class="h-full w-full">
+    <!-- Navbar fijo en la parte superior -->
+    <nav
+      id="navbar"
+      class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b border-white/20 shadow-lg"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <!-- Logo y título -->
+          <div class="flex items-center gap-3">
+            <div
+              class="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500"
+            >
+              <svg
+                class="h-6 w-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewbox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                ></path>
+              </svg>
+            </div>
+            <span
+              id="nav-title"
+              class="text-lg sm:text-xl font-bold tracking-tight"
+              >Empleo Web</span
+            >
+          </div>
+          <!-- Enlaces de navegación (desktop) -->
+          <div class="hidden md:flex items-center gap-6">
+            <button
+              type="button"
+              class="nav-link text-sm font-medium hover:opacity-80 transition-opacity"
+            >
+              Explorar
+            </button>
+            <button
+              type="button"
+              class="nav-link text-sm font-medium hover:opacity-80 transition-opacity"
+            >
+              Empresas
+            </button>
+            <button
+              type="button"
+              class="nav-link text-sm font-medium hover:opacity-80 transition-opacity"
+            >
+              Mi perfil
+            </button>
+          </div>
+          <!-- Botones de usuario (desktop) -->
+          <div class="hidden md:flex items-center gap-3">
+            <button
+              id="login-button"
+              type="button"
+              class="text-sm font-medium px-4 py-2 rounded-lg border border-white/30 hover:bg-white/5 transition-colors"
+            >
+              Iniciar Sesión
+            </button>
+            <button
+              id="signup-button"
+              type="button"
+              class="text-sm font-semibold px-4 py-2 rounded-lg shadow-md transition-colors"
+            >
+              Crear Cuenta
+            </button>
+          </div>
+          <!-- Botón menú móvil -->
+          <button
+            id="mobile-menu-button"
+            type="button"
+            class="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+            aria-expanded="false"
+            aria-label="Abrir menú de navegación"
+          >
+            <svg
+              class="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewbox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <!-- Menú móvil desplegable -->
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden border-t border-white/20 bg-black/40 backdrop-blur-md"
+      >
+        <div class="px-4 py-4 space-y-3">
+          <button
+            type="button"
+            class="mobile-nav-link block w-full text-left text-sm font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            Explorar
+          </button>
+          <button
+            type="button"
+            class="mobile-nav-link block w-full text-left text-sm font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            Empresas
+          </button>
+          <button
+            type="button"
+            class="mobile-nav-link block w-full text-left text-sm font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            Mi perfil
+          </button>
+          <div class="pt-3 border-t border-white/20 space-y-2">
+            <button
+              id="mobile-login-button"
+              type="button"
+              class="block w-full text-sm font-medium px-4 py-2 rounded-lg border border-white/30 hover:bg-white/5 transition-colors"
+            >
+              Iniciar Sesión
+            </button>
+            <button
+              id="mobile-signup-button"
+              type="button"
+              class="block w-full text-sm font-semibold px-4 py-2 rounded-lg shadow-md transition-colors"
+            >
+              Crear Cuenta
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div id="app-root" class="app-wrapper h-full w-full overflow-auto">
+      <div
+        id="app-background"
+        class="h-full w-full flex items-start justify-center py-6 px-4"
+        style="padding-top: 5rem"
+      >
+        <div
+          id="app-surface"
+          class="w-full max-w-5xl rounded-3xl shadow-xl border border-white/20 bg-white/10 backdrop-blur-md px-6 py-6 sm:px-10 sm:py-8"
+        >
+          <header class="mb-6">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+            >
+              <div>
+                <h1
+                  id="main-title"
+                  class="text-2xl sm:text-3xl font-bold tracking-tight"
+                >
+                  Empleo Web
+                </h1>
+                <p
+                  id="subtitle-text"
+                  class="mt-1 text-sm sm:text-base opacity-90"
+                >
+                  Encuentra tu próximo trabajo soñado con este simulador de
+                  búsqueda.
+                </p>
+              </div>
+              <div
+                class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs sm:text-sm"
+              >
+                <span
+                  class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/15"
+                >
+                  <!-- Simple SVG de maletín -->
+                  <svg class="h-4 w-4" viewbox="0 0 24 24" aria-hidden="true">
+                    <rect x="5" y="9" width="14" height="10" rx="2"></rect>
+                    <path d="M9 9V7a3 3 0 0 1 6 0v2"></path></svg
+                ></span>
+                <span class="font-medium">Simulador · Demo</span>
+              </div>
+            </div>
+          </header>
+          <main>
+            <!-- Buscador -->
+            <section aria-labelledby="search-section-title" class="mb-6">
+              <div
+                class="flex flex-col gap-3 rounded-2xl bg-white/10 px-4 py-4 sm:px-5 sm:py-5"
+              >
+                <div class="flex items-center justify-between gap-2">
+                  <h2
+                    id="search-section-title"
+                    class="text-base sm:text-lg font-semibold"
+                  >
+                    Busca ofertas de trabajo
+                  </h2>
+                  <span
+                    id="results-count-pill"
+                    class="text-xs rounded-full px-2 py-1 bg-white/10"
+                  >
+                    0 resultados
+                  </span>
+                </div>
+                <form
+                  id="search-form"
+                  class="grid grid-cols-1 md:grid-cols-12 gap-3"
+                  aria-label="Formulario de búsqueda de empleo"
+                >
+                  <!-- Palabra clave -->
+                  <div class="md:col-span-5 flex flex-col gap-1">
+                    <label
+                      for="keyword-input"
+                      class="text-xs font-medium opacity-80"
+                    >
+                      Puesto o palabra clave
+                    </label>
+                    <input
+                      id="keyword-input"
+                      name="keyword"
+                      type="text"
+                      class="w-full rounded-xl border border-white/20 bg-white/90 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-transparent focus:ring-2 focus:ring-offset-2"
+                      placeholder="Ej: Diseñador web, Frontend..."
+                      autocomplete="off"
+                    />
+                  </div>
+                  <!-- Localización -->
+                  <div class="md:col-span-3 flex flex-col gap-1">
+                    <label
+                      for="location-input"
+                      class="text-xs font-medium opacity-80"
+                    >
+                      Ubicación
+                    </label>
+                    <input
+                      id="location-input"
+                      name="location"
+                      type="text"
+                      class="w-full rounded-xl border border-white/20 bg-white/90 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-transparent focus:ring-2 focus:ring-offset-2"
+                      placeholder="Remoto, Madrid..."
+                      autocomplete="off"
+                    />
+                  </div>
+                  <!-- Tipo de empleo -->
+                  <div class="md:col-span-2 flex flex-col gap-1">
+                    <label
+                      for="type-select"
+                      class="text-xs font-medium opacity-80"
+                    >
+                      Tipo
+                    </label>
+                    <select
+                      id="type-select"
+                      name="type"
+                      class="w-full rounded-xl border border-white/20 bg-white/90 px-3 py-2 text-sm text-slate-900 focus:border-transparent focus:ring-2 focus:ring-offset-2"
+                    >
+                      <option value="">Todos</option>
+                      <option value="Tiempo completo">Tiempo completo</option>
+                      <option value="Medio tiempo">Medio tiempo</option>
+                      <option value="Freelance">Freelance</option>
+                      <option value="Prácticas">Prácticas</option>
+                    </select>
+                  </div>
+                  <!-- Botones -->
+                  <div class="md:col-span-2 flex items-end gap-2">
+                    <button
+                      id="search-button"
+                      type="submit"
+                      class="flex-1 rounded-xl px-3 py-2 text-sm font-semibold shadow-md transition-colors"
+                    >
+                      Buscar
+                    </button>
+                    <button
+                      id="clear-button"
+                      type="button"
+                      class="rounded-xl px-3 py-2 text-xs font-medium border border-white/30 bg-white/5 transition-colors"
+                    >
+                      Limpiar
+                    </button>
+                  </div>
+                </form>
+                <p class="text-[11px] sm:text-xs opacity-80">
+                  Este es un simulador visual: ideal para maquetas de
+                  portafolio, presentaciones o demostraciones de proyectos de
+                  empleo.
+                </p>
+              </div>
+            </section>
+            <!-- Contenido principal: resultados + guardados -->
+            <section
+              class="grid grid-cols-1 lg:grid-cols-3 gap-4"
+              aria-label="Resultados de empleo y guardados"
+            >
+              <!-- Resultados -->
+              <div
+                class="lg:col-span-2 flex flex-col rounded-2xl bg-white/10 px-4 py-4 sm:px-5 sm:py-5"
+              >
+                <div class="flex items-center justify-between gap-2 mb-3">
+                  <h2 class="text-base sm:text-lg font-semibold">
+                    Resultados de la búsqueda
+                  </h2>
+                  <div
+                    class="flex items-center gap-2 text-[11px] sm:text-xs opacity-80"
+                  >
+                    <span
+                      class="inline-flex h-2 w-2 rounded-full bg-emerald-400"
+                    ></span>
+                    <span>Datos simulados (no reales)</span>
+                  </div>
+                </div>
+                <div
+                  id="results-list"
+                  class="flex flex-col gap-3"
+                  aria-live="polite"
+                >
+                  <!-- Tarjetas de empleo se insertan aquí -->
+                </div>
+                <p
+                  id="no-results-text"
+                  class="mt-3 text-xs sm:text-sm opacity-80 hidden"
+                >
+                  No se encontraron ofertas para tu búsqueda. Prueba con otros
+                  términos o filtros.
+                </p>
+              </div>
+              <!-- Guardados -->
+              <aside
+                class="flex flex-col rounded-2xl bg-white/10 px-4 py-4 sm:px-5 sm:py-5"
+                aria-label="Ofertas guardadas"
+              >
+                <div class="flex items-center justify-between mb-3 gap-2">
+                  <h2
+                    id="saved-title"
+                    class="text-base sm:text-lg font-semibold"
+                  >
+                    Ofertas guardadas
+                  </h2>
+                  <button
+                    id="clear-saved-button"
+                    type="button"
+                    class="text-[11px] sm:text-xs font-medium rounded-full px-2 py-1 border border-white/25 bg-white/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    disabled
+                  >
+                    Vaciar
+                  </button>
+                </div>
+                <div
+                  id="saved-list"
+                  class="flex flex-col gap-2 text-xs sm:text-sm"
+                  aria-live="polite"
+                >
+                  <p id="no-saved-message" class="opacity-80">
+                    No has guardado ninguna oferta todavía. Pulsa “Guardar” en
+                    una oferta para verla aquí.
+                  </p>
+                </div>
+              </aside>
+            </section>
+          </main>
+          <footer class="mt-6 border-t border-white/15 pt-3">
+            <p
+              id="footer-text"
+              class="text-[11px] sm:text-xs opacity-80 text-center sm:text-left"
+            >
+              Búsqueda de empleo ·
+            </p>
+          </footer>
+        </div>
+      </div>
+      <!-- Toast simple -->
+      <div
+        id="toast"
+        class="fixed left-1/2 -translate-x-1/2 bottom-4 z-50 rounded-full bg-black/80 text-white text-xs sm:text-sm px-4 py-2 shadow-lg opacity-0 pointer-events-none transition-opacity"
+        role="status"
+        aria-live="polite"
+      >
+        <!-- mensaje dinámico -->
+      </div>
+    </div>
+    <script>
+      // ======= CONFIG Y ELEMENT SDK =======
+
+      const defaultConfig = {
+        // Colores (máx. 5)
+        background_color: "#0a0015", // BACKGROUND - morado oscuro profundo
+        surface_color: "#1a0033", // SECONDARY_SURFACE (panel principal) - morado oscuro
+        text_color: "#00ffff", // TEXT - cian neón brillante
+        primary_action_color: "#39ff14", // PRIMARY_ACTION (botón buscar, guardar) - verde neón
+        secondary_action_color: "#ffff00", // SECONDARY_ACTION (chips, detalles) - amarillo neón
+        // Tipografía
+        font_family: "system-ui",
+        font_size: 15,
+        // Textos editables
+        main_title: "Empleo Web",
+        subtitle:
+          "Encuentra tu próximo trabajo soñado con este simulador de búsqueda.",
+        search_title: "Busca ofertas de trabajo",
+        no_results_text:
+          "No se encontraron ofertas para tu búsqueda. Prueba con otros términos o filtros.",
+        saved_title: "Ofertas guardadas",
+        footer_text:
+          "Prototipo MVP, diseñado por Delulu Future Dev, Índigo Bárcena",
+      };
+
+      function applyConfigToUI(config) {
+        const safeConfig = Object.assign({}, defaultConfig, config || {});
+
+        const bgColor = safeConfig.background_color;
+        const surfaceColor = safeConfig.surface_color;
+        const textColor = safeConfig.text_color;
+        const primaryColor = safeConfig.primary_action_color;
+        const secondaryColor = safeConfig.secondary_action_color;
+        const fontFamily = safeConfig.font_family || defaultConfig.font_family;
+        const baseSize =
+          Number(safeConfig.font_size) || defaultConfig.font_size;
+
+        const appBackground = document.getElementById("app-background");
+        const appSurface = document.getElementById("app-surface");
+
+        if (appBackground) {
+          appBackground.style.backgroundColor = bgColor;
+        }
+        if (appSurface) {
+          appSurface.style.backgroundColor = surfaceColor;
+          appSurface.style.color = textColor;
+        }
+
+        // Textos
+        const titleEl = document.getElementById("main-title");
+        const subtitleEl = document.getElementById("subtitle-text");
+        const searchTitleEl = document.getElementById("search-section-title");
+        const noResultsEl = document.getElementById("no-results-text");
+        const savedTitleEl = document.getElementById("saved-title");
+        const footerTextEl = document.getElementById("footer-text");
+
+        if (titleEl) {
+          titleEl.textContent = safeConfig.main_title;
+        }
+        if (subtitleEl) {
+          subtitleEl.textContent = safeConfig.subtitle;
+        }
+        if (searchTitleEl) {
+          searchTitleEl.textContent = safeConfig.search_title;
+        }
+        if (noResultsEl) {
+          noResultsEl.textContent = safeConfig.no_results_text;
+        }
+        if (savedTitleEl) {
+          savedTitleEl.textContent = safeConfig.saved_title;
+        }
+        if (footerTextEl) {
+          footerTextEl.textContent = safeConfig.footer_text;
+        }
+
+        // Tipografía: escalado proporcional
+        const baseStack =
+          "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+        const fullFont = fontFamily ? fontFamily + ", " + baseStack : baseStack;
+
+        const allTextSelectors = [
+          "#main-title",
+          "#subtitle-text",
+          "#search-section-title",
+          "#results-count-pill",
+          "#no-results-text",
+          "#saved-title",
+          "#footer-text",
+          "#toast",
+          "label",
+          "button",
+          "input",
+          "select",
+          "p",
+          "h1",
+          "h2",
+        ];
+
+        document
+          .querySelectorAll(allTextSelectors.join(","))
+          .forEach(function (el) {
+            el.style.fontFamily = fullFont;
+          });
+
+        // Tamaños relativos
+        if (titleEl) {
+          titleEl.style.fontSize = String(baseSize * 1.6) + "px";
+        }
+        if (subtitleEl) {
+          subtitleEl.style.fontSize = String(baseSize * 0.95) + "px";
+        }
+        if (searchTitleEl) {
+          searchTitleEl.style.fontSize = String(baseSize * 1.1) + "px";
+        }
+        if (savedTitleEl) {
+          savedTitleEl.style.fontSize = String(baseSize * 1.1) + "px";
+        }
+        if (footerTextEl) {
+          footerTextEl.style.fontSize = String(baseSize * 0.8) + "px";
+        }
+        if (noResultsEl) {
+          noResultsEl.style.fontSize = String(baseSize * 0.9) + "px";
+        }
+
+        // Botones
+        const searchButton = document.getElementById("search-button");
+        const clearButton = document.getElementById("clear-button");
+        const clearSavedButton = document.getElementById("clear-saved-button");
+        const signupButton = document.getElementById("signup-button");
+        const mobileSignupButton = document.getElementById(
+          "mobile-signup-button"
+        );
+        const navbar = document.getElementById("navbar");
+        const navTitle = document.getElementById("nav-title");
+
+        if (searchButton) {
+          searchButton.style.backgroundColor = primaryColor;
+          searchButton.style.color = "#0f172a";
+        }
+        if (clearButton) {
+          clearButton.style.color = textColor;
+          clearButton.style.borderColor = textColor + "40";
+        }
+        if (clearSavedButton) {
+          clearSavedButton.style.color = textColor;
+          clearSavedButton.style.borderColor = textColor + "40";
+        }
+        if (signupButton) {
+          signupButton.style.backgroundColor = primaryColor;
+          signupButton.style.color = "#0f172a";
+        }
+        if (mobileSignupButton) {
+          mobileSignupButton.style.backgroundColor = primaryColor;
+          mobileSignupButton.style.color = "#0f172a";
+        }
+        if (navbar) {
+          navbar.style.backgroundColor = surfaceColor + "CC";
+          navbar.style.color = textColor;
+        }
+        if (navTitle) {
+          navTitle.style.color = textColor;
+        }
+
+        // Aplicar colores a enlaces de navegación
+        document
+          .querySelectorAll(".nav-link, .mobile-nav-link")
+          .forEach(function (link) {
+            link.style.color = textColor;
+          });
+
+        // Chips secundarios y enlaces de "Ver detalles"
+        document
+          .querySelectorAll(".job-chip, .job-link")
+          .forEach(function (el) {
+            el.style.backgroundColor = secondaryColor + "1A";
+            el.style.color = secondaryColor;
+          });
+
+        // Texto general dentro del surface
+        if (appSurface) {
+          appSurface
+            .querySelectorAll("p, span, li, label, input, select")
+            .forEach(function (el) {
+              if (!el.classList.contains("text-slate-900")) {
+                el.style.color = textColor;
+              }
+            });
+        }
+      }
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig: defaultConfig,
+          onConfigChange: async function (config) {
+            applyConfigToUI(config);
+          },
+          mapToCapabilities: function (config) {
+            const cfg = Object.assign({}, defaultConfig, config || {});
+            return {
+              recolorables: [
+                {
+                  get: function () {
+                    return cfg.background_color;
+                  },
+                  set: function (value) {
+                    cfg.background_color = value;
+                    window.elementSdk.setConfig({ background_color: value });
+                  },
+                },
+                {
+                  get: function () {
+                    return cfg.surface_color;
+                  },
+                  set: function (value) {
+                    cfg.surface_color = value;
+                    window.elementSdk.setConfig({ surface_color: value });
+                  },
+                },
+                {
+                  get: function () {
+                    return cfg.text_color;
+                  },
+                  set: function (value) {
+                    cfg.text_color = value;
+                    window.elementSdk.setConfig({ text_color: value });
+                  },
+                },
+                {
+                  get: function () {
+                    return cfg.primary_action_color;
+                  },
+                  set: function (value) {
+                    cfg.primary_action_color = value;
+                    window.elementSdk.setConfig({
+                      primary_action_color: value,
+                    });
+                  },
+                },
+                {
+                  get: function () {
+                    return cfg.secondary_action_color;
+                  },
+                  set: function (value) {
+                    cfg.secondary_action_color = value;
+                    window.elementSdk.setConfig({
+                      secondary_action_color: value,
+                    });
+                  },
+                },
+              ],
+              borderables: [],
+              fontEditable: {
+                get: function () {
+                  return cfg.font_family;
+                },
+                set: function (value) {
+                  cfg.font_family = value;
+                  window.elementSdk.setConfig({ font_family: value });
+                },
+              },
+              fontSizeable: {
+                get: function () {
+                  return cfg.font_size;
+                },
+                set: function (value) {
+                  cfg.font_size = value;
+                  window.elementSdk.setConfig({ font_size: value });
+                },
+              },
+            };
+          },
+          mapToEditPanelValues: function (config) {
+            const cfg = Object.assign({}, defaultConfig, config || {});
+            return new Map([
+              ["main_title", cfg.main_title],
+              ["subtitle", cfg.subtitle],
+              ["search_title", cfg.search_title],
+              ["no_results_text", cfg.no_results_text],
+              ["saved_title", cfg.saved_title],
+              ["footer_text", cfg.footer_text],
+            ]);
+          },
+        });
+      } else {
+        // Si el SDK no está aún, aplicamos el config por defecto
+        applyConfigToUI(defaultConfig);
+      }
+
+      // ======= LÓGICA DEL SIMULADOR (sin persistencia) =======
+
+      // Datos simulados de ofertas
+      const MOCK_JOBS = [
+        {
+          id: "1",
+          title: "Desarrollador Frontend React",
+          company: "PixelCraft Studio",
+          location: "Remoto �� España",
+          type: "Tiempo completo",
+          salary: "30.000 - 40.000 €/año",
+          tags: ["Frontend", "React", "JavaScript"],
+          posted: "Hace 2 días",
+        },
+        {
+          id: "2",
+          title: "Diseñador UI/UX Web",
+          company: "Nube Creativa",
+          location: "Híbrido · Barcelona",
+          type: "Tiempo completo",
+          salary: "28.000 - 35.000 €/año",
+          tags: ["Diseño", "Figma", "Prototipado"],
+          posted: "Hace 5 días",
+        },
+        {
+          id: "3",
+          title: "Developer Fullstack Junior",
+          company: "CodeLaunch",
+          location: "Remoto",
+          type: "Prácticas",
+          salary: "Beca · 800 €/mes",
+          tags: ["Node.js", "React", "SQL"],
+          posted: "Hace 1 día",
+        },
+        {
+          id: "4",
+          title: "Maquetador Web HTML/CSS",
+          company: "Media Pixel",
+          location: "Madrid",
+          type: "Freelance",
+          salary: "Proyecto puntual",
+          tags: ["HTML", "CSS", "Accesibilidad"],
+          posted: "Hace 1 semana",
+        },
+        {
+          id: "5",
+          title: "Content Manager Web",
+          company: "Digital Seed",
+          location: "Valencia",
+          type: "Medio tiempo",
+          salary: "18.000 - 22.000 €/año",
+          tags: ["SEO", "Copywriting", "CMS"],
+          posted: "Hace 4 días",
+        },
+      ];
+
+      let currentResults = MOCK_JOBS.slice();
+      let savedIds = [];
+
+      const resultsListEl = document.getElementById("results-list");
+      const resultsCountPill = document.getElementById("results-count-pill");
+      const noResultsText = document.getElementById("no-results-text");
+      const savedListEl = document.getElementById("saved-list");
+      const noSavedMessageEl = document.getElementById("no-saved-message");
+      const clearSavedButton = document.getElementById("clear-saved-button");
+      const searchForm = document.getElementById("search-form");
+      const keywordInput = document.getElementById("keyword-input");
+      const locationInput = document.getElementById("location-input");
+      const typeSelect = document.getElementById("type-select");
+      const clearButton = document.getElementById("clear-button");
+      const toastEl = document.getElementById("toast");
+
+      function showToast(message) {
+        if (!toastEl) return;
+        toastEl.textContent = message;
+        toastEl.classList.remove("opacity-0", "pointer-events-none");
+        toastEl.classList.add("opacity-100");
+        setTimeout(function () {
+          toastEl.classList.add("opacity-0");
+          toastEl.classList.remove("opacity-100");
+          setTimeout(function () {
+            toastEl.classList.add("pointer-events-none");
+          }, 200);
+        }, 1800);
+      }
+
+      function renderResults() {
+        if (!resultsListEl || !resultsCountPill || !noResultsText) return;
+
+        resultsListEl.innerHTML = "";
+
+        if (currentResults.length === 0) {
+          noResultsText.classList.remove("hidden");
+        } else {
+          noResultsText.classList.add("hidden");
+        }
+
+        resultsCountPill.textContent =
+          currentResults.length +
+          (currentResults.length === 1 ? " resultado" : " resultados");
+
+        currentResults.forEach(function (job) {
+          const card = document.createElement("article");
+          card.className =
+            "rounded-xl border border-white/15 bg-white/5 px-3 py-3 sm:px-4 sm:py-3 flex flex-col gap-2";
+
+          card.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+            <div>
+              <h3 class="text-sm sm:text-base font-semibold mb-0.5">${
+                job.title
+              }</h3>
+              <p class="text-xs sm:text-sm opacity-90">${job.company} · ${
+            job.location
+          }</p>
+            </div>
+            <div class="flex items-center gap-2 text-[11px] sm:text-xs opacity-80">
+              <span class="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-0.5">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                <span>${job.posted}</span>
+              </span>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 mt-1">
+            <span class="job-chip inline-flex items-center rounded-full px-2 py-1 text-[11px] sm:text-xs bg-white/5">
+              ${job.type}
+            </span>
+            <span class="inline-flex items-center rounded-full px-2 py-1 text-[11px] sm:text-xs bg-white/5 opacity-90">
+              💰 ${job.salary}
+            </span>
+            ${job.tags
+              .map(function (tag) {
+                return `<span class="inline-flex items-center rounded-full px-2 py-1 text-[11px] sm:text-xs bg-white/5 opacity-90">#${tag}</span>`;
+              })
+              .join("")}
+          </div>
+          <div class="mt-2 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              class="save-button rounded-full px-3 py-1.5 text-[11px] sm:text-xs font-semibold shadow-md transition-colors"
+              data-job-id="${job.id}"
+            >
+              ${savedIds.includes(job.id) ? "Guardado" : "Guardar"}
+            </button>
+            <button
+              type="button"
+              class="job-link text-[11px] sm:text-xs font-medium underline-offset-2 hover:underline"
+            >
+              Ver detalles (simulado)
+            </button>
+          </div>
+        `;
+
+          resultsListEl.appendChild(card);
+        });
+
+        // Aplicar colores secundarios a chips/enlaces según config actual
+        if (window.elementSdk) {
+          applyConfigToUI(window.elementSdk.config);
+        } else {
+          applyConfigToUI(defaultConfig);
+        }
+
+        // Añadir manejadores de botones Guardar
+        resultsListEl.querySelectorAll(".save-button").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            const jobId = btn.getAttribute("data-job-id");
+            toggleSaved(jobId);
+          });
+        });
+
+        // Botones "Ver detalles" (solo mensaje)
+        resultsListEl.querySelectorAll(".job-link").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            showToast("Vista de detalles simulada para maquetas.");
+          });
+        });
+      }
+
+      function renderSaved() {
+        if (!savedListEl || !noSavedMessageEl || !clearSavedButton) return;
+
+        savedListEl.innerHTML = "";
+        const savedJobs = MOCK_JOBS.filter(function (job) {
+          return savedIds.includes(job.id);
+        });
+
+        if (savedJobs.length === 0) {
+          noSavedMessageEl.classList.remove("hidden");
+          noSavedMessageEl.textContent =
+            "No has guardado ninguna oferta todavía. Pulsa “Guardar” en una oferta para verla aquí.";
+          clearSavedButton.disabled = true;
+          savedListEl.appendChild(noSavedMessageEl);
+          return;
+        }
+
+        clearSavedButton.disabled = false;
+
+        savedJobs.forEach(function (job) {
+          const row = document.createElement("div");
+          row.className =
+            "rounded-lg bg-white/5 px-3 py-2 flex flex-col gap-1 border border-white/15";
+
+          row.innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <p class="text-xs sm:text-sm font-semibold">${job.title}</p>
+              <p class="text-[11px] sm:text-xs opacity-80">${job.company}</p>
+            </div>
+            <button
+              type="button"
+              class="remove-saved text-[11px] sm:text-xs underline underline-offset-2"
+              data-job-id="${job.id}"
+            >
+              Quitar
+            </button>
+          </div>
+        `;
+
+          savedListEl.appendChild(row);
+        });
+
+        savedListEl.querySelectorAll(".remove-saved").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            const jobId = btn.getAttribute("data-job-id");
+            savedIds = savedIds.filter(function (id) {
+              return id !== jobId;
+            });
+            renderResults();
+            renderSaved();
+            showToast("Oferta eliminada de guardados.");
+          });
+        });
+
+        if (window.elementSdk) {
+          applyConfigToUI(window.elementSdk.config);
+        } else {
+          applyConfigToUI(defaultConfig);
+        }
+      }
+
+      function toggleSaved(jobId) {
+        if (!jobId) return;
+        if (savedIds.includes(jobId)) {
+          savedIds = savedIds.filter(function (id) {
+            return id !== jobId;
+          });
+          showToast("Oferta eliminada de guardados.");
+        } else {
+          savedIds.push(jobId);
+          showToast("Oferta guardada en tu lista.");
+        }
+        renderResults();
+        renderSaved();
+      }
+
+      function filterJobs() {
+        const keyword = (keywordInput.value || "").toLowerCase().trim();
+        const location = (locationInput.value || "").toLowerCase().trim();
+        const type = typeSelect.value;
+
+        currentResults = MOCK_JOBS.filter(function (job) {
+          var matchesKeyword =
+            !keyword ||
+            job.title.toLowerCase().includes(keyword) ||
+            job.company.toLowerCase().includes(keyword) ||
+            job.tags.join(" ").toLowerCase().includes(keyword);
+
+          var matchesLocation =
+            !location || job.location.toLowerCase().includes(location);
+
+          var matchesType = !type || job.type === type;
+
+          return matchesKeyword && matchesLocation && matchesType;
+        });
+
+        renderResults();
+      }
+
+      if (searchForm) {
+        searchForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+          filterJobs();
+        });
+      }
+
+      if (clearButton) {
+        clearButton.addEventListener("click", function () {
+          keywordInput.value = "";
+          locationInput.value = "";
+          typeSelect.value = "";
+          currentResults = MOCK_JOBS.slice();
+          renderResults();
+        });
+      }
+
+      if (clearSavedButton) {
+        clearSavedButton.addEventListener("click", function () {
+          savedIds = [];
+          renderResults();
+          renderSaved();
+          showToast("Se han vaciado las ofertas guardadas.");
+        });
+      }
+
+      // ======= NAVBAR INTERACCIONES =======
+      const mobileMenuButton = document.getElementById("mobile-menu-button");
+      const mobileMenu = document.getElementById("mobile-menu");
+      const loginButton = document.getElementById("login-button");
+      const mobileLoginButton = document.getElementById("mobile-login-button");
+
+      if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener("click", function () {
+          const isHidden = mobileMenu.classList.contains("hidden");
+          if (isHidden) {
+            mobileMenu.classList.remove("hidden");
+            mobileMenuButton.setAttribute("aria-expanded", "true");
+          } else {
+            mobileMenu.classList.add("hidden");
+            mobileMenuButton.setAttribute("aria-expanded", "false");
+          }
+        });
+      }
+
+      // Simulación de crear cuenta
+      if (signupButton) {
+        signupButton.addEventListener("click", function () {
+          showToast("Función 'Crear Cuenta' simulada para demo.");
+        });
+      }
+      if (mobileSignupButton) {
+        mobileSignupButton.addEventListener("click", function () {
+          showToast("Función 'Crear Cuenta' simulada para demo.");
+          if (mobileMenu) {
+            mobileMenu.classList.add("hidden");
+            if (mobileMenuButton) {
+              mobileMenuButton.setAttribute("aria-expanded", "false");
+            }
+          }
+        });
+      }
+
+      // Simulación de iniciar sesión
+      if (loginButton) {
+        loginButton.addEventListener("click", function () {
+          showToast("Función 'Iniciar Sesión' simulada para demo.");
+        });
+      }
+      if (mobileLoginButton) {
+        mobileLoginButton.addEventListener("click", function () {
+          showToast("Función 'Iniciar Sesión' simulada para demo.");
+          if (mobileMenu) {
+            mobileMenu.classList.add("hidden");
+            if (mobileMenuButton) {
+              mobileMenuButton.setAttribute("aria-expanded", "false");
+            }
+          }
+        });
+      }
+
+      // Enlaces de navegación (simulados)
+      document
+        .querySelectorAll(".nav-link, .mobile-nav-link")
+        .forEach(function (link) {
+          link.addEventListener("click", function () {
+            showToast("Navegación simulada para demo.");
+            if (mobileMenu && link.classList.contains("mobile-nav-link")) {
+              mobileMenu.classList.add("hidden");
+              if (mobileMenuButton) {
+                mobileMenuButton.setAttribute("aria-expanded", "false");
+              }
+            }
+          });
+        });
+
+      // Inicializar
+      renderResults();
+      renderSaved();
+
+      // Aplicar estilos iniciales
+      if (window.elementSdk) {
+        applyConfigToUI(window.elementSdk.config);
+      } else {
+        applyConfigToUI(defaultConfig);
+      }
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'9ac3b13d1719eef2',t:'MTc2NTQ0MjU4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
