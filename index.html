@@ -2,7 +2,7 @@
 <html lang="es" class="h-full">
   <head>
     <meta charset="UTF-8" />
-    <title>Empleo Web - Simulador de búsqueda</title>
+    <title>Empleo Web </title>
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Element SDK (obligatorio) -->
@@ -197,9 +197,7 @@
                 <p
                   id="subtitle-text"
                   class="mt-1 text-sm sm:text-base opacity-90"
-                >
-                  Encuentra tu próximo trabajo soñado con este simulador de
-                  búsqueda.
+                > Encuentra tu próximo trabajo soñado y da el siguiente gran paso hacia la vida profesional que realmente deseas.
                 </p>
               </div>
               <div
@@ -213,7 +211,7 @@
                     <rect x="5" y="9" width="14" height="10" rx="2"></rect>
                     <path d="M9 9V7a3 3 0 0 1 6 0v2"></path></svg
                 ></span>
-                <span class="font-medium">Simulador · Demo</span>
+                <span class="font-medium">Demo</span>
               </div>
             </div>
           </header>
@@ -315,9 +313,8 @@
                   </div>
                 </form>
                 <p class="text-[11px] sm:text-xs opacity-80">
-                  Este es un simulador visual: ideal para maquetas de
-                  portafolio, presentaciones o demostraciones de proyectos de
-                  empleo.
+                  Este es un simulador visual para proyectos Fullstack UX-U, creado por Delulu Future Dev.
+              
                 </p>
               </div>
             </section>
@@ -340,7 +337,7 @@
                     <span
                       class="inline-flex h-2 w-2 rounded-full bg-emerald-400"
                     ></span>
-                    <span>Datos simulados (no reales)</span>
+                    <span>Demo </span>
                   </div>
                 </div>
                 <div
@@ -393,16 +390,7 @@
             </section>
           </main>
           <footer class="mt-6 border-t border-white/15 pt-3">
-            <p
-              id="footer-text"
-              class="text-[11px] sm:text-xs opacity-80 text-center sm:text-left"
-            >
-              Simulador de búsqueda de empleo · Demostración · No muestra
-              ofertas reales.
-            </p>
-          </footer>
-        </div>
-      </div>
+       
       <!-- Toast simple -->
       <div
         id="toast"
@@ -429,13 +417,13 @@
         // Textos editables
         main_title: "Empleo Web",
         subtitle:
-          "Encuentra tu próximo trabajo soñado con este simulador de búsqueda.",
+          "Encuentra tu próximo trabajo soñado y da el siguiente gran paso hacia la vida profesional que realmente deseas.",
         search_title: "Busca ofertas de trabajo",
         no_results_text:
           "No se encontraron ofertas para tu búsqueda. Prueba con otros términos o filtros.",
         saved_title: "Ofertas guardadas",
         footer_text:
-          "Simulador de búsqueda de empleo · Demostración · No muestra ofertas reales.",
+          "Simulador de búsqueda de empleo ",
       };
 
       function applyConfigToUI(config) {
@@ -703,13 +691,13 @@
 
       // ======= LÓGICA DEL SIMULADOR (sin persistencia) =======
 
-      // Datos simulados de ofertas
+      // Datos
       const MOCK_JOBS = [
         {
           id: "1",
           title: "Desarrollador Frontend React",
           company: "PixelCraft Studio",
-          location: "Remoto �� España",
+          location: "Remoto . España",
           type: "Tiempo completo",
           salary: "30.000 - 40.000 €/año",
           tags: ["Frontend", "React", "JavaScript"],
@@ -849,7 +837,7 @@
               type="button"
               class="job-link text-[11px] sm:text-xs font-medium underline-offset-2 hover:underline"
             >
-              Ver detalles (simulado)
+              Ver detalles 
             </button>
           </div>
         `;
